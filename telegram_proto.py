@@ -10,69 +10,20 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # requests.packages.urllib3.disable_warnings()  # Подавление InsecureRequestWarning, с которым я пока ещё не разобрался
 ADMIN_ID = 74102915  # My ID
 
+
+def get_token():
+    with open('token', 'r') as f:
+        token = f.read()
+        return token
+
+
 class Telegram:
     def __init__(self, file="_"):
         self.file = file
-        self.TOKEN = '1014483043:AAGvXAvIUY72v-BAQVNwKdZwdobwgMQS9S4'
-        #self.TOKEN = '357941877:AAGdDwh8APfdfO_voutaE8SBdkbdwzV1GEg' #test
+        self.TOKEN = get_token()
         self.URL = 'https://api.telegram.org/bot'
-        self.admin_id = 74102915
+        self.admin_id = ADMIN_ID
         self.offset = 0
-        # self.game_admin = [74102915] #test
-        # self.players_ids = [74102915, 313758232] #test
-        # self.teams = {74102915: u'Команда Жени', 313758232: u'Команда Саши'} #test
-        # self.game_admin = [74102915]  # eilat
-        # self.players_ids = [74102915, 215837322, 184492479, 485999416] # eilat
-        # self.teams = {215837322: u'Команда Димы',
-        #               184492479: u'Команда Нины',
-        #               485999416: u'Команда Идан',
-        #               74102915: u'[ADMIN] Женя Раев'
-        #               }
-
-        # self.game_admin = [74102915, 238387622]
-        # self.players_ids = [225150625,
-        #                     59943433,
-        #                     184492479,
-        #                     215837322,
-        #                     229348273,
-        #                     694854891,
-        #                     697991268,
-        #                     263168928,
-        #                     290797216,
-        #                     238387622,
-        #                     74102915
-        #                     ]
-        # self.teams = {225150625: u'Команда Юли',
-        #               59943433: u'Команда Оли',
-        #               184492479: u'Команда Нины из Эйлата',
-        #               215837322: u'Команда Димы из Эйлата',
-        #               229348273: u'Команда Лизы из Ришона',
-        #               694854891: u'Команда Коли из Реховота',
-        #               697991268: u'Алекс',
-        #               263168928: u'Яна',
-        #               290797216: u'Дима (друг Яны)',
-        #               238387622: u'[ADMIN] Лиза Шестакова',
-        #               74102915: u'[ADMIN] Женя Раев'
-        #               }
-        self.game_admin = [74102915, 238387622]
-        self.players_ids = [225150625,
-                            127634951,
-                            229348273,
-                            694854891,
-                            697991268,
-                            263168928,
-                            238387622,
-                            74102915
-                            ]
-        self.teams = {225150625: u'Команда Юли',
-                      127634951: u'Команда Оли',
-                      229348273: u'Команда Лизы из Ришона',
-                      694854891: u'Команда Коли из Реховота',
-                      697991268: u'Алекс',
-                      263168928: u'Яна',
-                      238387622: u'[ADMIN] Лиза Шестакова',
-                      74102915: u'[ADMIN] Женя Раев'
-                      }
 
         self.host = socket.getfqdn()
         self.Interval = 2
