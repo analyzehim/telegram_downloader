@@ -1,9 +1,7 @@
 import os
 import glob
 import shutil
-
-home_folder = 'C:\Users\Raev_e\Downloads\\'
-#home_folder = 'C:\Users\Raev_e\Pictures\\1\\'
+from scrapper import home_folder
 
 august_date = 1564617600
 september_date = 1567296000
@@ -17,19 +15,13 @@ april_date = 1585699200
 may_date = 1588291200
 june_date = 1590969600
 
+months = ['June', 'August', 'May', 'April', 'March', 'February',
+          'January', 'December', 'November', 'October', 'September', 'WTF']
 
-# os.mkdir(home_folder + 'June')
-# os.mkdir(home_folder + 'August')
-# os.mkdir(home_folder + 'May')
-# os.mkdir(home_folder + 'April')
-# os.mkdir(home_folder + 'March')
-# os.mkdir(home_folder + 'February')
-# os.mkdir(home_folder + 'January')
-# os.mkdir(home_folder + 'December')
-# os.mkdir(home_folder + 'November')
-# os.mkdir(home_folder + 'October')
-# os.mkdir(home_folder + 'September')
-# os.mkdir(home_folder + 'WTF')
+for month in months:
+    directory = home_folder + month
+    if not os.path.exists(directory):
+        os.mkdir(directory)
 
 
 def check_month(date):
@@ -55,7 +47,6 @@ def check_month(date):
     if date >= september_date:
         return 'September'
     if date >= august_date:
-
         return 'August'
     else:
         return 'WTF'

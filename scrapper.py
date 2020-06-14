@@ -9,7 +9,16 @@ import os
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # requests.packages.urllib3.disable_warnings()  # Подавление InsecureRequestWarning, с которым я пока ещё не разобрался
 ADMIN_ID = 74102915  # My ID
+if not os.path.exists('media'):
+    os.mkdir('media')
+home_folder = os.getcwd() + '\media\\'
 
+def log_event(text):
+    with open('hebrew_log.txt', 'a') as f:
+        event = '%s >> %s' % (time.ctime(), text)
+        print event + '\n'
+        f.write(event + '\n')
+    return
 
 def get_token():
     with open('token', 'r') as f:
@@ -38,15 +47,15 @@ class Telegram:
         if not request.json()['result']:
             return
         parametersList = []
-        print request.json()
+        #print request.json()
         for update in request.json()['result']:
-            print "-------\n-------"
-            print update
+            #print "-------\n-------"
+            #print update
             if 'message' in update and 'photo' in update['message']:
                 photo_info = update['message']['photo']
                 file_id = self.get_file_id(photo_info)
                 file_date = update['message']['forward_date']
-                print "___", file_date, file_id
+                #print "___", file_date, file_id
                 file_info = self.get_file(file_id, file_date)
                 #self.send_text(self.admin_id, file_info)
                 time.sleep(1)
@@ -54,13 +63,13 @@ class Telegram:
                 continue
             if 'message' in update and 'video' in update['message']:
                 video_info = update['message']['video']
-                print video_info
-                print "  ____"
+                #print video_info
+                #print "  ____"
                 #file_id = self.get_file_id(video_info)
                 file_id = video_info['file_id']
-                print file_id
+                #print file_id
                 file_date = update['message']['forward_date']
-                print "___", file_date, file_id
+                #print "___", file_date, file_id
                 file_info = self.get_file(file_id, file_date)
                 #self.send_text(self.admin_id, file_info)
                 time.sleep(1)
@@ -70,8 +79,8 @@ class Telegram:
             if 'message' not in update or 'text' not in update['message']:
                 self.offset = update['update_id']
                 continue
-            if 'forward_from' in update['message']:
-                print update['message']['forward_from']
+            # if 'forward_from' in update['message']:
+            #     print update['message']['forward_from']
             self.offset = update['update_id']
 
 
@@ -94,19 +103,6 @@ class Telegram:
                 pass
         return parametersList
 
-    def send_text_with_keyboard(self, chat_id, text, keyboard):
-            try:
-                log_event('Sending to %s: %s; keyboard: %s' % (chat_id, text, keyboard))  # Logging
-            except:
-                log_event('Error with LOGGING')
-            json_data = {"chat_id": chat_id, "text": text,
-                         "reply_markup": {"keyboard": keyboard, "one_time_keyboard": True}}
-            request = requests.post(self.URL + self.TOKEN + '/sendMessage', json=json_data)  # HTTP request
-
-            if not request.status_code == 200:  # Check server status
-                return False
-            return request.json()['ok']  # Check API
-
     def send_text(self, chat_id, text):
             try:
                 log_event('Sending to %s: %s' % (chat_id, text))  # Logging
@@ -115,34 +111,20 @@ class Telegram:
             data = {'chat_id': chat_id, 'text': text}  # Request create
             #print text
             proxies = {'http':'socks5://161.35.70.249:1080', 'https':'socks5://161.35.70.249:1080'}
-            print self.URL + self.TOKEN + '/sendMessage', data, proxies
+            #print self.URL + self.TOKEN + '/sendMessage', data, proxies
             request = requests.post(self.URL + self.TOKEN + '/sendMessage', data=data, verify=False)  # HTTP request
-            print request.text
+            #print request.text
             if not request.status_code == 200:  # Check server status
                 return False
             return request.json()['ok']  # Check API
 
-    def send_text_markdown(self, chat_id, text):
-            try:
-                log_event('Sending to %s: %s' % (chat_id, text))  # Logging
-            except:
-                log_event('Error with LOGGING')
-            data = {'chat_id': chat_id, 'text': text, 'parse_mode': 'Markdown'}  # Request create
-            #print text
-            request = requests.post(self.URL + self.TOKEN + '/sendMessage', data=data, verify=False)  # HTTP request
-            print request.text
-            if not request.status_code == 200:  # Check server status
-                return False
-            return request.json()['ok']  # Check API
 
     def get_file_id(self, photo_info):
         max_size = 0
         file_id = 0
-        print 2
         for photo in photo_info:
             if photo['file_size'] >= max_size:
                 file_id = photo['file_id']
-        print 3
         return file_id
 
 
@@ -154,11 +136,9 @@ class Telegram:
         request = requests.post(self.URL + self.TOKEN + '/getFile?file_id={0}'.format(file_id), verify=False)  # HTTP request
         if not request.json()['ok']:
             print "ERRRORRRRR", file_id, file_date, request.text
-            print "ERRRORRRRR", file_id, file_date, request.text
-            print "ERRRORRRRR", file_id, file_date, request.text
             time.sleep(60)
             return
-        print request.json()['result']['file_path']
+        #print request.json()['result']['file_path']
         file_type = request.json()['result']['file_path'].split('.')[-1]
         self.download_file(request.json()['result']['file_path'], file_date, file_type)
         if not request.status_code == 200:  # Check server status
@@ -167,11 +147,11 @@ class Telegram:
 
     def download_file(self, path, file_date, file_type):
         url = "https://api.telegram.org/file/bot" + self.TOKEN + '/' + path
-        file_name = 'C:\Users\Raev_e\Downloads\{0}.{1}'.format(str(file_date), file_type)
-        temp_name = 'C:\Users\Raev_e\Downloads\pemp.{0}'.format(file_type)
+        file_name = home_folder + '{0}.{1}'.format(str(file_date), file_type)
+        temp_name = home_folder + 'pemp.{0}'.format(file_type)
 
         request = requests.get(url, verify=False)
-        print request.status_code, url
+        #print request.status_code, url
         with open(temp_name, 'wb') as f:
             f.write(request.content)
 
@@ -194,27 +174,15 @@ class Telegram:
         return
 
 
-    def send_photo(self, chat_id, imagePath):
-        log_event('Sending photo to %s: %s' % (chat_id, imagePath))  # Logging
-        data = {'chat_id': chat_id}
-        files = {'photo': (imagePath, open(imagePath, "rb"))}
-        requests.post(self.URL + self.TOKEN + '/sendPhoto', data=data, files=files, verify=False)
-        request = requests.post(self.URL + self.TOKEN + '/sendPhoto', data=data, files=files, verify=False)  # HTTP request
-        if not request.status_code == 200:  # Check server status
-            return False
-
-        return request.json()['ok']  # Check API
-
-    def ping(self):
-            log_event('Sending to %s: %s' % (self.chat_id, 'ping'))
-            data = {'chat_id': self.chat_id, 'text': 'ping'}
-            requests.post(self.URL + self.TOKEN + '/sendMessage', data=data, verify=False)  # HTTP request
-
-
-def log_event(text):
-        f = open('hebrew_log.txt', 'a')
-        event = '%s >> %s' % (time.ctime(), text)
-        print event + '\n'
-        f.write(event + '\n')
-        f.close()
-        return
+if __name__ == "__main__":
+    telebot = Telegram()
+    telebot.send_text(telebot.admin_id, "Run on {0}".format(telebot.host))
+    while True:
+        try:
+            telebot.get_updates()
+            time.sleep(telebot.Interval)
+        except KeyboardInterrupt:
+            print 'Interrupt by user..'
+            break
+        except Exception, e:
+            log_event(str(e))
